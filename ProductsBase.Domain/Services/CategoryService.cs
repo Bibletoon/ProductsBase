@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using ProductsBase.Data.Contexts;
 using ProductsBase.Data.Models;
-using ProductsBase.Data.Repositories;
-using ProductsBase.Data.Repositories.Interfaces;
+using ProductsBase.Data.Utility.Extensions;
 using ProductsBase.Domain.Services.Communication;
 using ProductsBase.Domain.Services.Interfaces;
 
@@ -12,30 +13,27 @@ namespace ProductsBase.Domain.Services
 {
     public class CategoryService : ICategoryService
     {
-        private readonly ICategoryRepository _categoryRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly AppDbContext _dbContext;
         private readonly ILogger _logger;
 
-        public CategoryService(ICategoryRepository categoryRepository,
-            IUnitOfWork unitOfWork,
+        public CategoryService(AppDbContext dbContext,
             ILoggerFactory loggerFactory)
         {
-            _categoryRepository = categoryRepository;
-            _unitOfWork = unitOfWork;
+            _dbContext = dbContext;
             _logger = loggerFactory.CreateLogger<CategoryService>();
         }
 
-        public async Task<IEnumerable<Category>> ListAllAsync() => await _categoryRepository.ListAllAsync();
+        public async Task<IEnumerable<Category>> ListAllAsync() => await _dbContext.Categories.ToListAsync();
 
         public async Task<Page<Category>> ListAllPagedAsync(int pageNumber, int pageSize) =>
-            await _categoryRepository.ListAllPagedAsync(pageNumber, pageSize);
+            await _dbContext.Categories.PaginateAsync(pageNumber, pageSize);
 
         public async Task<ItemResponse<Category>> SaveAsync(Category category)
         {
             try
             {
-                await _categoryRepository.AddAsync(category);
-                await _unitOfWork.CompleteAsync();
+                await _dbContext.Categories.AddAsync(category);
+                await _dbContext.SaveChangesAsync();
 
                 return new ItemResponse<Category>(category);
             }
@@ -49,7 +47,7 @@ namespace ProductsBase.Domain.Services
 
         public async Task<ItemResponse<Category>> UpdateAsync(int id, Category category)
         {
-            var existingCategory = await _categoryRepository.FindByIdAsync(id);
+            var existingCategory = await _dbContext.Categories.FindAsync(id);
 
             if (existingCategory is null)
             {
@@ -60,8 +58,8 @@ namespace ProductsBase.Domain.Services
 
             try
             {
-                _categoryRepository.Update(existingCategory);
-                await _unitOfWork.CompleteAsync();
+                _dbContext.Categories.Update(existingCategory);
+                await _dbContext.SaveChangesAsync();
 
                 return new ItemResponse<Category>(existingCategory);
             }
@@ -75,7 +73,7 @@ namespace ProductsBase.Domain.Services
 
         public async Task<ItemResponse<Category>> DeleteAsync(int id)
         {
-            var category = await _categoryRepository.FindByIdAsync(id);
+            var category = await _dbContext.Categories.FindAsync(id);
 
             if (category is null)
             {
@@ -85,8 +83,8 @@ namespace ProductsBase.Domain.Services
 
             try
             {
-                _categoryRepository.Remove(category);
-                await _unitOfWork.CompleteAsync();
+                _dbContext.Categories.Remove(category);
+                await _dbContext.SaveChangesAsync();
 
                 return new ItemResponse<Category>(category);
             }

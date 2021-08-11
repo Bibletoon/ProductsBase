@@ -11,8 +11,6 @@ using ProductsBase.Api.Mapping;
 using ProductsBase.Api.Middlewares;
 using ProductsBase.Api.Middlewares.Filters;
 using ProductsBase.Data.Contexts;
-using ProductsBase.Data.Repositories;
-using ProductsBase.Data.Repositories.Interfaces;
 using ProductsBase.Domain.Services;
 using ProductsBase.Domain.Services.Interfaces;
 
@@ -35,13 +33,8 @@ namespace ProductsBase.Api
 
             services.AddDbContext<AppDbContext>(o => { o.UseInMemoryDatabase("my-app-db"); });
 
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddScoped<IProductRepository, ProductRepository>();
-
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IProductService, ProductService>();
-
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>

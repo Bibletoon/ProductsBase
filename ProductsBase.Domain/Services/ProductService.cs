@@ -1,49 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using ProductsBase.Data.Repositories;
-using ProductsBase.Data.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using ProductsBase.Domain.Services.Communication;
 using ProductsBase.Domain.Services.Interfaces;
 using Microsoft.Extensions.Logging;
+using ProductsBase.Data.Contexts;
 using ProductsBase.Data.Models;
+using ProductsBase.Data.Utility.Extensions;
 
 namespace ProductsBase.Domain.Services
 {
     public class ProductService : IProductService
     {
-        private readonly IProductRepository _productRepository;
-        private readonly ICategoryRepository _categoryRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly AppDbContext _dbContext;
 
         private readonly ILogger _logger;
 
-        public ProductService(IProductRepository productRepository,
-            ICategoryRepository categoryRepository,
-            IUnitOfWork unitOfWork,
-            ILoggerFactory loggerFactory)
+        public ProductService(AppDbContext dbContext, ILoggerFactory loggerFactory)
         {
-            _productRepository = productRepository;
-            _categoryRepository = categoryRepository;
-            _unitOfWork = unitOfWork;
+            _dbContext = dbContext;
             _logger = loggerFactory.CreateLogger<ProductService>();
         }
 
 
-        public async Task<IEnumerable<Product>> ListAllAsync() => await _productRepository.ListAllAsync();
+        public async Task<IEnumerable<Product>> ListAllAsync() => await _dbContext.Products.ToListAsync();
 
         public async Task<Page<Product>> ListAllPagedAsync(int pageNumber, int pageSize) =>
-            await _productRepository.ListAllPagedAsync(pageNumber, pageSize);
+            await _dbContext.Products.PaginateAsync(pageNumber, pageSize);
 
         public async Task<ItemListResponse<Product>> ListByCategoryAsync(int categoryId)
         {
-            var category = await _categoryRepository.FindByIdAsync(categoryId);
+            var category = await _dbContext.Categories.FindAsync(categoryId);
             if (category is null)
             {
                 return new ItemListResponse<Product>("Invalid category");
             }
 
-            var products = await _productRepository.ListByCategoryAsync(category);
+            var products = await _dbContext.Products.Where(p=>p.Category == category).ToListAsync();
             return new ItemListResponse<Product>(products);
         }
 
@@ -51,28 +46,29 @@ namespace ProductsBase.Domain.Services
             int pageNumber,
             int pageSize)
         {
-            var category = await _categoryRepository.FindByIdAsync(categoryId);
+            var category = await _dbContext.Categories.FindAsync(categoryId);
             if (category is null)
             {
                 return new ItemResponse<Page<Product>>("Invalid category");
             }
 
-            var products = await _productRepository.ListByCategoryPagedAsync(category, pageNumber, pageSize);
+            var products = await _dbContext.Products.Where(p=>p.Category == category)
+                                           .PaginateAsync(pageNumber, pageSize);
             return new ItemResponse<Page<Product>>(products);
         }
 
         public async Task<ItemResponse<Product>> SaveAsync(Product product)
         {
+            var category = await _dbContext.Categories.FindAsync(product.CategoryId);
+            if (category is null)
+            {
+                return new ItemResponse<Product>("Invalid category");
+            }
+            
             try
             {
-                var category = await _categoryRepository.FindByIdAsync(product.CategoryId);
-                if (category is null)
-                {
-                    return new ItemResponse<Product>("Invalid category");
-                }
-
-                await _productRepository.AddAsync(product);
-                await _unitOfWork.CompleteAsync();
+                await _dbContext.Products.AddAsync(product);
+                await _dbContext.SaveChangesAsync();
 
                 return new ItemResponse<Product>(product);
             }
@@ -86,14 +82,14 @@ namespace ProductsBase.Domain.Services
 
         public async Task<ItemResponse<Product>> UpdateAsync(int id, Product product)
         {
-            var existingProduct = await _productRepository.FindByIdAsync(id);
+            var existingProduct = await _dbContext.Products.FindAsync(id);
 
             if (existingProduct is null)
             {
                 return new ItemResponse<Product>("Product was not found");
             }
 
-            var newCategory = await _categoryRepository.FindByIdAsync(product.CategoryId);
+            var newCategory = await _dbContext.Categories.FindAsync(product.CategoryId);
 
             if (newCategory is null)
             {
@@ -109,8 +105,8 @@ namespace ProductsBase.Domain.Services
 
             try
             {
-                _productRepository.Update(existingProduct);
-                await _unitOfWork.CompleteAsync();
+                _dbContext.Products.Update(existingProduct);
+                await _dbContext.SaveChangesAsync();
 
                 return new ItemResponse<Product>(existingProduct);
             }
@@ -124,7 +120,7 @@ namespace ProductsBase.Domain.Services
 
         public async Task<ItemResponse<Product>> DeleteAsync(int id)
         {
-            var productToDelete = await _productRepository.FindByIdAsync(id);
+            var productToDelete = await _dbContext.Products.FindAsync(id);
             if (productToDelete is null)
             {
                 return new ItemResponse<Product>("Can not find product");
@@ -132,8 +128,8 @@ namespace ProductsBase.Domain.Services
 
             try
             {
-                _productRepository.Remove(productToDelete);
-                await _unitOfWork.CompleteAsync();
+                _dbContext.Products.Remove(productToDelete);
+                await _dbContext.SaveChangesAsync();
 
                 return new ItemResponse<Product>(productToDelete);
             }
