@@ -12,7 +12,7 @@ namespace ProductsBase.Api.Controllers
     {
         private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
-
+        
         public CategoriesController(ICategoryService categoryService, IMapper mapper)
         {
             _categoryService = categoryService;
@@ -20,6 +20,7 @@ namespace ProductsBase.Api.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(PageResource<CategoryResource>),200)]
         public async Task<PageResource<CategoryResource>> GetAllAsync([FromQuery] PageQueryParametets queryParametets)
         {
             var categories = await _categoryService.ListAllPagedAsync(queryParametets.page, queryParametets.size);
@@ -29,6 +30,8 @@ namespace ProductsBase.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(CategoryResource),200)]
+        [ProducesResponseType(typeof(ErrorResource),400)]
         public async Task<IActionResult> PostCategoryAsync([FromBody] SaveCategoryResource saveCategoryResource)
         {
             var category = _mapper.Map<SaveCategoryResource, Category>(saveCategoryResource);
@@ -37,7 +40,7 @@ namespace ProductsBase.Api.Controllers
 
             if (!result.Success)
             {
-                return BadRequest(result.Message);
+                return BadRequest(new ErrorResource(result.Message));
             }
 
             CategoryResource categoryResource = _mapper.Map<Category, CategoryResource>(result.Item);
@@ -46,6 +49,8 @@ namespace ProductsBase.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(CategoryResource),200)]
+        [ProducesResponseType(typeof(ErrorResource),400)]
         public async Task<IActionResult> PutCategoryAsync(int id,
             [FromBody] SaveCategoryResource updateCategoryResource)
         {
@@ -55,7 +60,7 @@ namespace ProductsBase.Api.Controllers
 
             if (!result.Success)
             {
-                return BadRequest(result.Message);
+                return BadRequest(new ErrorResource(result.Message));
             }
 
             CategoryResource categoryResource = _mapper.Map<Category, CategoryResource>(result.Item);
@@ -64,13 +69,15 @@ namespace ProductsBase.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(CategoryResource),200)]
+        [ProducesResponseType(typeof(ErrorResource),400)]
         public async Task<IActionResult> DeleteCategoryAsync(int id)
         {
             var result = await _categoryService.DeleteAsync(id);
 
             if (!result.Success)
             {
-                return BadRequest(result.Message);
+                return BadRequest(new ErrorResource(result.Message));
             }
 
             CategoryResource categoryResourse = _mapper.Map<Category, CategoryResource>(result.Item);

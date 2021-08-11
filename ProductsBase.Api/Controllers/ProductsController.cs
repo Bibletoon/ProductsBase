@@ -20,6 +20,8 @@ namespace ProductsBase.Api.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(PageResource<ProductResource>),200)]
+        [ProducesResponseType(typeof(ErrorResource),400)]
         public async Task<IActionResult> GetAsync([FromQuery] PageQueryParametets queryParametets,
             [FromQuery] int? categoryId)
         {
@@ -35,7 +37,7 @@ namespace ProductsBase.Api.Controllers
                                                                    queryParametets.size);
                 if (!result.Success)
                 {
-                    return BadRequest(result.Message);
+                    return BadRequest(new ErrorResource(result.Message));
                 }
 
                 products = result.Item;
@@ -47,6 +49,8 @@ namespace ProductsBase.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(PageResource<ProductResource>),200)]
+        [ProducesResponseType(typeof(ErrorResource),400)]
         public async Task<IActionResult> PostAsync([FromBody] SaveProductResource saveProductResource)
         {
             var product = _mapper.Map<SaveProductResource, Product>(saveProductResource);
@@ -55,7 +59,7 @@ namespace ProductsBase.Api.Controllers
 
             if (!result.Success)
             {
-                return BadRequest(result.Message);
+                return BadRequest(new ErrorResource(result.Message));
             }
 
             ProductResource productResource = _mapper.Map<Product, ProductResource>(result.Item);
@@ -64,6 +68,8 @@ namespace ProductsBase.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(typeof(PageResource<ProductResource>),200)]
+        [ProducesResponseType(typeof(ErrorResource),400)]
         public async Task<IActionResult> PutAsync(int id, [FromBody] SaveProductResource productResource)
         {
             var product = _mapper.Map<SaveProductResource, Product>(productResource);
@@ -71,7 +77,7 @@ namespace ProductsBase.Api.Controllers
             var result = await _productService.UpdateAsync(id, product);
             if (!result.Success)
             {
-                return BadRequest(result.Message);
+                return BadRequest(new ErrorResource(result.Message));
             }
 
             ProductResource updatedProductResource = _mapper.Map<Product, ProductResource>(result.Item);
@@ -80,13 +86,15 @@ namespace ProductsBase.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(PageResource<ProductResource>),200)]
+        [ProducesResponseType(typeof(ErrorResource),400)]
         public async Task<IActionResult> DeleteAsync(int id)
         {
             var result = await _productService.DeleteAsync(id);
 
             if (!result.Success)
             {
-                return BadRequest(result.Message);
+                return BadRequest(new ErrorResource(result.Message));
             }
 
             ProductResource productResource = _mapper.Map<Product, ProductResource>(result.Item);
