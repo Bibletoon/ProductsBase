@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ProductsBase.Domain.Models;
 using ProductsBase.Domain.Security.Hashing;
 
-namespace ProdictsBase.Data.Seeding
+namespace ProductsBase.Data.Seeding
 {
     public class DatabaseSeeder
     {

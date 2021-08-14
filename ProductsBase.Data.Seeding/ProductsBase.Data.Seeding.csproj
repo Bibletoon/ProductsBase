@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <RootNamespace>ProdictsBase.Data.Seeding</RootNamespace>
+        <RootNamespace>ProductsBase.Data.Seeding</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -10,6 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Bogus" Version="33.0.2" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
     </ItemGroup>
 

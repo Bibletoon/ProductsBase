@@ -9,7 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using ProdictsBase.Data.Seeding;
+using ProductsBase.Data.Seeding;
 using ProductsBase.Api.Mapping;
 using ProductsBase.Api.Middlewares;
 using ProductsBase.Api.Middlewares.Filters;

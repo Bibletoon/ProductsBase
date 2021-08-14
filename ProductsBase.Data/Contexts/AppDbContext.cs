@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using ProdictsBase.Data.Seeding;
+using ProductsBase.Data.Seeding;
 using ProductsBase.Domain.Models;
 
 namespace ProductsBase.Data.Contexts
