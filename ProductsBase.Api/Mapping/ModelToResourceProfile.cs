@@ -1,7 +1,9 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using ProductsBase.Api.Resources;
-using ProductsBase.Data.Models;
-using ProductsBase.Data.Utility.Extensions;
+using ProductsBase.Api.Utility.Extensions;
+using ProductsBase.Domain.Models;
+using ProductsBase.Domain.Security.Tokens;
 
 namespace ProductsBase.Api.Mapping
 {
@@ -9,6 +11,13 @@ namespace ProductsBase.Api.Mapping
     {
         public ModelToResourceProfile()
         {
+            CreateMap<User, UserResource>().ForMember(u => u.Roles, opt => opt.MapFrom(u => u.Roles.Select(ur => ur.Name)));
+
+            CreateMap<AccessToken, AccessTokenResource>()
+                .ForMember(x => x.AccessToken, opt => opt.MapFrom(src => src.Token))
+                .ForMember(src => src.RefreshToken,
+                           opt => opt.MapFrom(src => src.RefreshToken.Token));
+
             CreateMap<Category, CategoryResource>();
 
             CreateMap<Product, ProductResource>()

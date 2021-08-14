@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using ProductsBase.Api.Resources;
-using ProductsBase.Data.Models;
+using ProductsBase.Domain.Models;
 
 namespace ProductsBase.Api.Mapping
 {
@@ -8,6 +8,9 @@ namespace ProductsBase.Api.Mapping
     {
         public ResourceToModelProfile()
         {
+            CreateMap<UserResource, User>();
+            CreateMap<UserCredentialResource, User>();
+            
             CreateMap<SaveCategoryResource, Category>();
 
             CreateMap<SaveProductResource, Product>()

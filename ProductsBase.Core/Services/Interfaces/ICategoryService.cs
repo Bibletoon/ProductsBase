@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using ProductsBase.Data.Models;
+using ProductsBase.Domain.Models;
 using ProductsBase.Domain.Services.Communication;
 
 namespace ProductsBase.Domain.Services.Interfaces

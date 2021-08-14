@@ -1,12 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <LangVersion>9</LangVersion>
+        <RootNamespace>ProductsBase.DataAccess</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="5.0.8" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.9" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\ProductsBase.Data.Seeding\ProductsBase.Data.Seeding.csproj" />
+      <ProjectReference Include="..\ProductsBase.Domain\ProductsBase.Domain.csproj" />
     </ItemGroup>
 
 </Project>

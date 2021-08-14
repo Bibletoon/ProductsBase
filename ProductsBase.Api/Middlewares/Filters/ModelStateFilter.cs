@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using ProductsBase.Domain.Common.Extensions;
+using ProductsBase.Api.Utility.Extensions;
 
 namespace ProductsBase.Api.Middlewares.Filters
 {

@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ProductsBase.Data.Contexts;
-using ProductsBase.Data.Models;
 using ProductsBase.Data.Utility.Extensions;
+using ProductsBase.Domain.Models;
 using ProductsBase.Domain.Services.Communication;
 using ProductsBase.Domain.Services.Interfaces;
 
@@ -23,7 +23,7 @@ namespace ProductsBase.Domain.Services
             _logger = loggerFactory.CreateLogger<CategoryService>();
         }
 
-        public async Task<IEnumerable<Category>> ListAllAsync() => await _dbContext.Categories.ToListAsync();
+        public async Task<IEnumerable<Category>> ListAllAsync() =>  await _dbContext.Categories.ToListAsync();
 
         public async Task<Page<Category>> ListAllPagedAsync(int pageNumber, int pageSize) =>
             await _dbContext.Categories.PaginateAsync(pageNumber, pageSize);

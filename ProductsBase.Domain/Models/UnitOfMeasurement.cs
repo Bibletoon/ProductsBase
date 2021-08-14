@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace ProductsBase.Data.Models
+namespace ProductsBase.Domain.Models
 {
     public enum UnitOfMeasurement
     {

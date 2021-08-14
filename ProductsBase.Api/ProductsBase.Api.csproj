@@ -15,6 +15,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\ProductsBase.Core\ProductsBase.Core.csproj" />
+        <ProjectReference Include="..\ProductsBase.Data\ProductsBase.Data.csproj" />
         <ProjectReference Include="..\ProductsBase.Domain\ProductsBase.Domain.csproj" />
     </ItemGroup>
 

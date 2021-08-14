@@ -2,8 +2,8 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ProductsBase.Api.Resources;
+using ProductsBase.Domain.Models;
 using ProductsBase.Domain.Services.Interfaces;
-using ProductsBase.Data.Models;
 
 namespace ProductsBase.Api.Controllers
 {

@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,13 +7,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using ProdictsBase.Data.Seeding;
 using ProductsBase.Api.Mapping;
 using ProductsBase.Api.Middlewares;
 using ProductsBase.Api.Middlewares.Filters;
+using ProductsBase.Api.Utility.Extensions;
 using ProductsBase.Data.Contexts;
+using ProductsBase.Domain.Security.Hashing;
+using ProductsBase.Domain.Security.Tokens;
 using ProductsBase.Domain.Services;
 using ProductsBase.Domain.Services.Interfaces;
+using TokenHandler = ProductsBase.Domain.Security.Tokens.TokenHandler;
 
 namespace ProductsBase.Api
 {
@@ -28,24 +35,45 @@ namespace ProductsBase.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAd"));
-
-            services.AddDbContext<AppDbContext>(o => { o.UseInMemoryDatabase("my-app-db"); });
+            services.AddDbContext<AppDbContext>(o =>
+                                                {
+                                                    o.UseInMemoryDatabase("products-base-db");
+                                                });
 
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
 
+            services.AddSingleton<IPasswordHasher, PasswordHasher>();
+            services.AddSingleton<ITokenHandler, TokenHandler>();
+            var tokenOptions = Configuration.GetSection("TokenOptions").Get<TokenOptions>();
+            var signingConfigurations = new SigningConfigurations(tokenOptions.Secret);
+            services.AddSingleton(signingConfigurations);
+
+            services.AddSingleton<DatabaseSeeder>();
+            
             services.AddControllers();
-            services.AddSwaggerGen(c =>
-                                   {
-                                       c.SwaggerDoc(
-                                           "v1", new OpenApiInfo { Title = "ProductsBase.Api", Version = "v1" });
-                                   });
+            services.AddCustomSwagger();
 
             services.AddMvc(opts => { opts.Filters.Add(typeof(ModelStateFilter)); });
-
+            services.Configure<TokenOptions>(Configuration.GetSection("TokenOptions"));
             services.AddAutoMapper(typeof(ModelToResourceProfile));
+            
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                   .AddJwtBearer(jwtBearerOptions =>
+                                 {
+                                     jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters()
+                                     {
+                                         ValidateAudience = true,
+                                         ValidateLifetime = true,
+                                         ValidateIssuerSigningKey = true,
+                                         ValidIssuer = tokenOptions.Issuer,
+                                         ValidAudience = tokenOptions.Audience,
+                                         IssuerSigningKey = signingConfigurations.SecurityKey,
+                                         ClockSkew = TimeSpan.Zero
+                                     };
+                                 });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,15 +82,13 @@ namespace ProductsBase.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ProductsBase.Api v1"));
+                app.UseCustomSwagger();
             }
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
-
+            
             app.UseAuthentication();
             app.UseAuthorization();
 

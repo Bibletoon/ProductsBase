@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Reflection;
 
-namespace ProductsBase.Data.Utility.Extensions
+namespace ProductsBase.Api.Utility.Extensions
 {
     public static class EnumExtensions
     {

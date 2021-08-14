@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <LangVersion>9</LangVersion>
+        <RootNamespace>ProductsBase.Domain</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\ProductsBase.Data\ProductsBase.Data.csproj" />
+        <ProjectReference Include="..\ProductsBase.Domain\ProductsBase.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="6.7.1" />
+      <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.7.1" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.7.1" />
+    </ItemGroup>
+
+</Project>

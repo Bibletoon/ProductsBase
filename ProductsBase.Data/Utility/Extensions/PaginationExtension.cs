@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using ProductsBase.Data.Models;
+using ProductsBase.Domain.Models;
 
 namespace ProductsBase.Data.Utility.Extensions
 {

@@ -7,8 +7,8 @@ using ProductsBase.Domain.Services.Communication;
 using ProductsBase.Domain.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using ProductsBase.Data.Contexts;
-using ProductsBase.Data.Models;
 using ProductsBase.Data.Utility.Extensions;
+using ProductsBase.Domain.Models;
 
 namespace ProductsBase.Domain.Services
 {

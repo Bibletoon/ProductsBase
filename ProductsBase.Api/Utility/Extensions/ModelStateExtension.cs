@@ -2,7 +2,7 @@
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace ProductsBase.Domain.Common.Extensions
+namespace ProductsBase.Api.Utility.Extensions
 {
     public static class ModelStateExtension
     {
