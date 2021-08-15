@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using ProductsBase.Data.Seeding.EntityGenerators;
 using ProductsBase.Domain.Models;
 using ProductsBase.Domain.Security.Hashing;
 
@@ -9,10 +10,20 @@ namespace ProductsBase.Data.Seeding
     public class DatabaseSeeder
     {
         private IPasswordHasher _passwordHasher;
+        
+        private readonly List<IEntityGenerator> _generators = new List<IEntityGenerator>();
 
         public DatabaseSeeder(IPasswordHasher passwordHasher)
         {
             _passwordHasher = passwordHasher;
+            var categoriesGenerator = new CategoriesGenerator();
+            var productsGenerator = new ProductsGenerator(categoriesGenerator.Categories);
+            
+            _generators.AddRange(new List<IEntityGenerator>()
+            {
+                categoriesGenerator,
+                productsGenerator
+            });
         }
 
         public void Seed(ModelBuilder modelBuilder)
@@ -37,31 +48,7 @@ namespace ProductsBase.Data.Seeding
                 new { RoleId = 2, UserId = 2 }
             );
 
-            modelBuilder.Entity<Category>().HasData
-            (
-                new Category { Id = 100, Name = "Fruits and Vegetables" }, // Id set manually due to in-memory provider
-                new Category { Id = 101, Name = "Dairy" }
-            );
-            
-            modelBuilder.Entity<Product>().HasData
-            (
-                new Product
-                {
-                    Id = 100,
-                    Name = "Apple",
-                    QuantityInPackage = 1,
-                    UnitOfMeasurement = UnitOfMeasurement.Unity,
-                    CategoryId = 100
-                },
-                new Product
-                {
-                    Id = 101,
-                    Name = "Milk",
-                    QuantityInPackage = 2,
-                    UnitOfMeasurement = UnitOfMeasurement.Liter,
-                    CategoryId = 101,
-                }
-            );
+            _generators.ForEach(g=>g.Seed(modelBuilder));
         }
     }
 }

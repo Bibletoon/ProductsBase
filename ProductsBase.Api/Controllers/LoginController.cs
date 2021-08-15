@@ -20,6 +20,8 @@ namespace ProductsBase.Api.Controllers
         }
         
         [Route("/api/login")]
+        [ProducesResponseType(typeof(AccessTokenResource),200)]
+        [ProducesResponseType(typeof(ErrorResource),400)]
         [HttpPost]
         public async Task<IActionResult> LoginAsync([FromBody] UserCredentialResource credentialResource)
         {
@@ -36,13 +38,15 @@ namespace ProductsBase.Api.Controllers
         }
         
         [Route("/api/token/refresh")]
+        [ProducesResponseType(typeof(AccessTokenResource),200)]
+        [ProducesResponseType(typeof(ErrorResource),400)]
         [HttpPost]
         public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshTokenResource refreshTokenResource)
         {
             var response = await _authenticationService.RefreshTokenAsync(refreshTokenResource.Token, refreshTokenResource.UserEmail);
             if(!response.Success)
             {
-                return BadRequest(response.Message);
+                return BadRequest(new ErrorResource(response.Message));
             }
            
             var tokenResource = _mapper.Map<AccessToken, AccessTokenResource>(response.Token);

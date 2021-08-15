@@ -25,10 +25,10 @@ namespace ProductsBase.Domain.Services
         }
 
 
-        public async Task<IEnumerable<Product>> ListAllAsync() => await _dbContext.Products.ToListAsync();
+        public async Task<IEnumerable<Product>> ListAllAsync() => await _dbContext.Products.Include(p=>p.Category).ToListAsync();
 
         public async Task<Page<Product>> ListAllPagedAsync(int pageNumber, int pageSize) =>
-            await _dbContext.Products.PaginateAsync(pageNumber, pageSize);
+            await _dbContext.Products.Include(p=>p.Category).PaginateAsync(pageNumber, pageSize);
 
         public async Task<ItemListResponse<Product>> ListByCategoryAsync(int categoryId)
         {
@@ -38,7 +38,7 @@ namespace ProductsBase.Domain.Services
                 return new ItemListResponse<Product>("Invalid category");
             }
 
-            var products = await _dbContext.Products.Where(p=>p.Category == category).ToListAsync();
+            var products = await _dbContext.Products.Include(p=>p.Category).Where(p=>p.Category == category).ToListAsync();
             return new ItemListResponse<Product>(products);
         }
 

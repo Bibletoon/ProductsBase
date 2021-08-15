@@ -34,6 +34,8 @@ namespace ProductsBase.Api.Controllers
         }
         
         [HttpPost]
+        [ProducesResponseType(typeof(UserResource),200)]
+        [ProducesResponseType(typeof(ErrorResource),400)]
         public async Task<IActionResult> CreateUserAsync([FromBody] UserCredentialResource userResource)
         {
             var user = _mapper.Map<UserCredentialResource, User>(userResource);
